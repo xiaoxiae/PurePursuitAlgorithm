@@ -105,10 +105,7 @@ public class PurePursuit extends PApplet {
             float[] translatedMouseCoords = new float[]{x - lineStartPoints[0], y - lineStartPoints[1]};
 
             // The angle to turn all coordinates by
-            // Since atan only works in quadrants I and IV, some additional calculation must be made
-            float angle = -(float) Math.atan(translatedCoords[1] / translatedCoords[0]);
-            if (translatedCoords[1] < 0 && translatedCoords[0] < 0) angle += PI;
-            else if (translatedCoords[0] < 0) angle -= PI;
+            float angle = -(float) Math.atan2(translatedCoords[1], translatedCoords[0]);
 
             // Translated and rotated path segment and the mouse coordinates
             float[] turnedCoords = new float[]{translatedCoords[0] * (float) Math.cos(angle) - translatedCoords[1] * (float) Math.sin(angle), 0};
