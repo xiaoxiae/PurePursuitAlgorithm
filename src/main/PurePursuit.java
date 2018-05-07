@@ -74,6 +74,9 @@ public class PurePursuit extends PApplet {
 
             // If the function returned a valid point, draw it
             if (lookaheadPoint.length == 2) {
+                // Fill the circle with the desired color of the point to be pursued
+                fill(pursuedCircleColor[0], pursuedCircleColor[1], pursuedCircleColor[2]);
+
                 line(x, y, lookaheadPoint[0], lookaheadPoint[1]);
                 ellipse(lookaheadPoint[0], lookaheadPoint[1], pointSize, pointSize);
             }
@@ -124,9 +127,6 @@ public class PurePursuit extends PApplet {
 
         // Do we even have any points to draw? If we do, attempt to do so.
         if (points.size() > 0) {
-            // Fill the circle with the desired color of the point to be pursued
-            fill(pursuedCircleColor[0], pursuedCircleColor[1], pursuedCircleColor[2]);
-
             // If the mouse is close enough to the end, simply select that as the pursuit target
             float[] endPointCoordinates = points.get(points.size() - 1);
 
