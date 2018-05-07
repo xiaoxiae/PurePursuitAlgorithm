@@ -9,6 +9,11 @@ public class PurePursuit extends PApplet {
     // List of the points
     private List<float[]> points;
 
+    // A PathFollower object and its variables
+    private PathFollower pathFollower;
+    private float pathFollowerSpeed = 2.5f;
+    private float pathFollowerStopDistance = 2;
+
     //Size of the ellipses
     private float pointSize = 4;
 
@@ -39,6 +44,7 @@ public class PurePursuit extends PApplet {
      */
     private void reset() {
         points = new ArrayList<>();
+        pathFollower = null;
     }
 
     @Override
@@ -73,12 +79,29 @@ public class PurePursuit extends PApplet {
             float[] lookaheadPoint = getLookaheadPoint(x, y);
 
             // If the function returned a valid point, draw it
-            if (lookaheadPoint.length == 2) {
-                // Fill the circle with the desired color of the point to be pursued
-                fill(pursuedCircleColor[0], pursuedCircleColor[1], pursuedCircleColor[2]);
+            if (lookaheadPoint.length == 2) drawTwoPoints(x, y, lookaheadPoint[0], lookaheadPoint[1]);
+        }
 
-                line(x, y, lookaheadPoint[0], lookaheadPoint[1]);
-                ellipse(lookaheadPoint[0], lookaheadPoint[1], pointSize, pointSize);
+        // Draw and potentially moves the PathFollower
+        if (pathFollower != null) {
+            // Positions of the pathFollower and its lookahead point
+            float[] followerPosition = pathFollower.getFollowerPosition();
+            float[] lookaheadCoordinates = getLookaheadPoint(followerPosition[0], followerPosition[1]);
+
+            // To calculate the distance between the lookahead point and the follower
+            double offsetLookaheadX = lookaheadCoordinates[0] - followerPosition[0];
+            double offsetLookaheadY = lookaheadCoordinates[1] - followerPosition[1];
+
+            // If the follower reached the destination, delete the follower
+            if (Math.sqrt(offsetLookaheadX * offsetLookaheadX + offsetLookaheadY * offsetLookaheadY) < pathFollowerStopDistance) {
+                pathFollower = null;
+            } else {
+                // Move the follower upon pressing 'f'
+                if (keyPressed && key == 'f')
+                    pathFollower.moveFollowerTowardsPoint(lookaheadCoordinates[0], lookaheadCoordinates[1]);
+
+                // Draw the follower
+                drawTwoPoints(followerPosition[0], followerPosition[1], lookaheadCoordinates[0], lookaheadCoordinates[1]);
             }
         }
     }
@@ -90,7 +113,7 @@ public class PurePursuit extends PApplet {
      * @param y The y of the origin.
      * @return A float[] coordinate pair if the lookahead point exists, or an empty float[0] if it doesn't.
      */
-    float[] getLookaheadPoint(int x, int y) {
+    float[] getLookaheadPoint(float x, float y) {
         // The point that will be selected to be pursued from the line segments
         float[] lookaheadPoint = new float[2];
 
@@ -136,19 +159,53 @@ public class PurePursuit extends PApplet {
             }
 
             // If we selected any points to pursue, draw them.
-            if (lookaheadPoint[0] != 0 && lookaheadPoint[1] != 0) return new float[]{lookaheadPoint[0], lookaheadPoint[1]};
+            if (lookaheadPoint[0] != 0 && lookaheadPoint[1] != 0) {
+                return new float[]{lookaheadPoint[0], lookaheadPoint[1]};
+            }
         }
 
         return new float[0];
     }
 
+    /**
+     * Draw two points and a line between them.
+     *
+     * @param x1 The x value of the first point.
+     * @param y1 The y value of the first point.
+     * @param x2 The x value of the second point.
+     * @param y2 The y value of the second point.
+     */
+    private void drawTwoPoints(float x1, float y1, float x2, float y2) {
+        // Line between object and lookahead point
+        line(x1, y1, x2, y2);
+
+        // Object point
+        ellipse(x1, y1, pointSize, pointSize);
+
+        // Fill the circle with the desired color of the point to be pursued
+        fill(pursuedCircleColor[0], pursuedCircleColor[1], pursuedCircleColor[2]);
+
+        // Lookahead point
+        ellipse(x2, y2, pointSize, pointSize);
+
+    }
+
     @Override
     public void keyPressed() {
+        //Reset the game
         if (key == 'r') reset();
+
+        // Create a new follower object at the beginning of the path
+        if (key == 'n' && points.size() > 0) {
+            float[] firstPointCoordinates = points.get(0);
+
+            pathFollower = new PathFollower(firstPointCoordinates[0], firstPointCoordinates[1], pathFollowerSpeed);
+        }
     }
 
     @Override
     public void mousePressed() {
+        // Add a new path point
         if (mouseButton == RIGHT) {
             points.add(new float[]{mouseX, mouseY});
         }
