@@ -34,6 +34,9 @@ public class PurePursuit extends PApplet {
         points = new ArrayList<>();
     }
 
+    /**
+     * Reset the simulation.
+     */
     private void reset() {
         points = new ArrayList<>();
     }
@@ -61,72 +64,82 @@ public class PurePursuit extends PApplet {
             }
         }
 
-        float[] lookaheadPoint = getLookaheadPoint();
+        // If mouse was pressed, get the lookahead point
+        if (mousePressed && mouseButton == LEFT) {
+            int x = mouseX;
+            int y = mouseY;
 
-        if (lookaheadPoint.length == 2) {
-            line(mouseX, mouseY, lookaheadPoint[0], lookaheadPoint[1]);
-            ellipse(lookaheadPoint[0], lookaheadPoint[1], pointSize, pointSize);
+            // Get the lookahead point from the mouse coordinates
+            float[] lookaheadPoint = getLookaheadPoint(x, y);
+
+            // If the function returned a valid point, draw it
+            if (lookaheadPoint.length == 2) {
+                line(x, y, lookaheadPoint[0], lookaheadPoint[1]);
+                ellipse(lookaheadPoint[0], lookaheadPoint[1], pointSize, pointSize);
+            }
         }
     }
 
-    float[] getLookaheadPoint() {
+    /**
+     * Generate a lookahead point on the path.
+     *
+     * @param x The x of the origin.
+     * @param y The y of the origin.
+     * @return A float[] coordinate pair if the lookahead point exists, or an empty float[0] if it doesn't.
+     */
+    float[] getLookaheadPoint(int x, int y) {
         // The point that will be selected to be pursued from the line segments
         float[] lookaheadPoint = new float[2];
 
-        // If the mouse left-clicked, draw the line lookahead line
-        if (mousePressed && mouseButton == LEFT) {
-            // Iterate through all the points
-            for (int i = 0; i < points.size() - 1; i++) {
-                // The path segment points
-                float[] lineStartPoints = points.get(i);
-                float[] lineEndPoints = points.get(i + 1);
+        // Iterate through all the points
+        for (int i = 0; i < points.size() - 1; i++) {
+            // The path segment points
+            float[] lineStartPoints = points.get(i);
+            float[] lineEndPoints = points.get(i + 1);
 
-                // Translated path segment and the mouse coordinates
-                float[] translatedCoords = new float[]{lineEndPoints[0] - lineStartPoints[0], lineEndPoints[1] - lineStartPoints[1]};
-                float[] translatedMouseCoords = new float[]{mouseX - lineStartPoints[0], mouseY - lineStartPoints[1]};
+            // Translated path segment and the mouse coordinates
+            float[] translatedCoords = new float[]{lineEndPoints[0] - lineStartPoints[0], lineEndPoints[1] - lineStartPoints[1]};
+            float[] translatedMouseCoords = new float[]{x - lineStartPoints[0], y - lineStartPoints[1]};
 
-                // The angle to turn all coordinates by
-                // Since atan only works in quadrants I and IV, some additional calculation must be made
-                float angle = -(float) Math.atan(translatedCoords[1] / translatedCoords[0]);
-                if (translatedCoords[1] < 0 && translatedCoords[0] < 0) angle += PI;
-                else if (translatedCoords[0] < 0) angle -= PI;
+            // The angle to turn all coordinates by
+            // Since atan only works in quadrants I and IV, some additional calculation must be made
+            float angle = -(float) Math.atan(translatedCoords[1] / translatedCoords[0]);
+            if (translatedCoords[1] < 0 && translatedCoords[0] < 0) angle += PI;
+            else if (translatedCoords[0] < 0) angle -= PI;
 
-                // Translated and rotated path segment and the mouse coordinates
-                float[] turnedCoords = new float[]{translatedCoords[0] * (float) Math.cos(angle) - translatedCoords[1] * (float) Math.sin(angle), 0};
-                float[] turnedMouseCoords = new float[]{translatedMouseCoords[0] * (float) Math.cos(angle) - translatedMouseCoords[1] * (float) Math.sin(angle), translatedMouseCoords[1] * (float) Math.cos(angle) + translatedMouseCoords[0] * (float) Math.sin(angle)};
+            // Translated and rotated path segment and the mouse coordinates
+            float[] turnedCoords = new float[]{translatedCoords[0] * (float) Math.cos(angle) - translatedCoords[1] * (float) Math.sin(angle), 0};
+            float[] turnedMouseCoords = new float[]{translatedMouseCoords[0] * (float) Math.cos(angle) - translatedMouseCoords[1] * (float) Math.sin(angle), translatedMouseCoords[1] * (float) Math.cos(angle) + translatedMouseCoords[0] * (float) Math.sin(angle)};
 
-                // The distance from the mouse's x coordinate above the line segment to the possible point on the line segment
-                // Take note that if the segment is too far, the result of this operation wil be NaN (we can't create a  right triangle if a side is longer than a hypotenuse)
-                float intersectingPointX = turnedMouseCoords[0] + (float) Math.sqrt(lookaheadDistance * lookaheadDistance - turnedMouseCoords[1] * turnedMouseCoords[1]);
+            // The distance from the mouse's x coordinate above the line segment to the possible point on the line segment
+            // Take note that if the segment is too far, the result of this operation wil be NaN (we can't create a  right triangle if a side is longer than a hypotenuse)
+            float intersectingPointX = turnedMouseCoords[0] + (float) Math.sqrt(lookaheadDistance * lookaheadDistance - turnedMouseCoords[1] * turnedMouseCoords[1]);
 
-                // If the point lays on the translated and rotated segment
-                if ((intersectingPointX > 0) && (intersectingPointX < turnedCoords[0])) {
-                    lookaheadPoint[0] = intersectingPointX * cos(-angle) + lineStartPoints[0];
-                    lookaheadPoint[1] = intersectingPointX * sin(-angle) + lineStartPoints[1];
-                }
+            // If the point lays on the translated and rotated segment
+            if ((intersectingPointX > 0) && (intersectingPointX < turnedCoords[0])) {
+                lookaheadPoint[0] = intersectingPointX * cos(-angle) + lineStartPoints[0];
+                lookaheadPoint[1] = intersectingPointX * sin(-angle) + lineStartPoints[1];
+            }
+        }
+
+        // Do we even have any points to draw? If we do, attempt to do so.
+        if (points.size() > 0) {
+            // Fill the circle with the desired color of the point to be pursued
+            fill(pursuedCircleColor[0], pursuedCircleColor[1], pursuedCircleColor[2]);
+
+            // If the mouse is close enough to the end, simply select that as the pursuit target
+            float[] endPointCoordinates = points.get(points.size() - 1);
+
+            float endX = endPointCoordinates[0];
+            float endY = endPointCoordinates[1];
+
+            if (Math.sqrt((endX - x) * (endX - x) + (endY - y) * (endY - y)) <= lookaheadDistance) {
+                lookaheadPoint[0] = endX;
+                lookaheadPoint[1] = endY;
             }
 
-            // Do we even have any points to draw? If we do, attempt to do so.
-            if (points.size() > 0) {
-                // Fill the circle with the desired color of the point to be pursued
-                fill(pursuedCircleColor[0], pursuedCircleColor[1], pursuedCircleColor[2]);
-
-                // If the mouse is close enough to the end, simply select that as the pursuit target
-                float[] endPointCoordinates = points.get(points.size() - 1);
-
-                float x = endPointCoordinates[0];
-                float y = endPointCoordinates[1];
-
-                if (Math.sqrt((x - mouseX) * (x - mouseX) + (y - mouseY) * (y - mouseY)) <= lookaheadDistance) {
-                    lookaheadPoint[0] = x;
-                    lookaheadPoint[1] = y;
-                }
-
-                // If we selected any points to pursue, draw them.
-                if (lookaheadPoint[0] != 0 && lookaheadPoint[1] != 0) {
-                    return new float[]{lookaheadPoint[0], lookaheadPoint[1]};
-                }
-            }
+            // If we selected any points to pursue, draw them.
+            if (lookaheadPoint[0] != 0 && lookaheadPoint[1] != 0) return new float[]{lookaheadPoint[0], lookaheadPoint[1]};
         }
 
         return new float[0];
