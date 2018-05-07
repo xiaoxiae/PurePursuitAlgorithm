@@ -12,6 +12,7 @@ public class PurePursuit extends PApplet {
     // A PathFollower object and its variables
     private PathFollower pathFollower;
     private float pathFollowerSpeed = 2.5f;
+    private float pathFollowerStopDistance = 2;
 
     //Size of the ellipses
     private float pointSize = 4;
@@ -87,12 +88,21 @@ public class PurePursuit extends PApplet {
             float[] followerPosition = pathFollower.getFollowerPosition();
             float[] lookaheadCoordinates = getLookaheadPoint(followerPosition[0], followerPosition[1]);
 
-            // Move the follower upon pressing 'f'
-            if (keyPressed && key == 'f')
-                pathFollower.moveFollowerTowardsPoint(lookaheadCoordinates[0], lookaheadCoordinates[1]);
+            // To calculate the distance between the lookahead point and the follower
+            double offsetLookaheadX = lookaheadCoordinates[0] - followerPosition[0];
+            double offsetLookaheadY = lookaheadCoordinates[1] - followerPosition[1];
 
-            // Draw the follower
-            drawTwoPoints(followerPosition[0], followerPosition[1], lookaheadCoordinates[0], lookaheadCoordinates[1]);
+            // If the follower reached the destination, delete the follower
+            if (Math.sqrt(offsetLookaheadX * offsetLookaheadX + offsetLookaheadY * offsetLookaheadY) < pathFollowerStopDistance) {
+                pathFollower = null;
+            } else {
+                // Move the follower upon pressing 'f'
+                if (keyPressed && key == 'f')
+                    pathFollower.moveFollowerTowardsPoint(lookaheadCoordinates[0], lookaheadCoordinates[1]);
+
+                // Draw the follower
+                drawTwoPoints(followerPosition[0], followerPosition[1], lookaheadCoordinates[0], lookaheadCoordinates[1]);
+            }
         }
     }
 
