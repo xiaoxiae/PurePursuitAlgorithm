@@ -61,6 +61,15 @@ public class PurePursuit extends PApplet {
             }
         }
 
+        float[] lookaheadPoint = getLookaheadPoint();
+
+        if (lookaheadPoint.length == 2) {
+            line(mouseX, mouseY, lookaheadPoint[0], lookaheadPoint[1]);
+            ellipse(lookaheadPoint[0], lookaheadPoint[1], pointSize, pointSize);
+        }
+    }
+
+    float[] getLookaheadPoint() {
         // The point that will be selected to be pursued from the line segments
         float[] lookaheadPoint = new float[2];
 
@@ -115,11 +124,12 @@ public class PurePursuit extends PApplet {
 
                 // If we selected any points to pursue, draw them.
                 if (lookaheadPoint[0] != 0 && lookaheadPoint[1] != 0) {
-                    line(mouseX, mouseY, lookaheadPoint[0], lookaheadPoint[1]);
-                    ellipse(lookaheadPoint[0], lookaheadPoint[1], pointSize, pointSize);
+                    return new float[]{lookaheadPoint[0], lookaheadPoint[1]};
                 }
             }
         }
+
+        return new float[0];
     }
 
     @Override
