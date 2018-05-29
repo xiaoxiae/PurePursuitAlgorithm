@@ -62,6 +62,7 @@ public class PurePursuit extends PApplet {
             float[] pointCoords = points.get(i);
 
             // Create an eclipse as the point
+            stroke(0);
             fill(0);
             ellipse(pointCoords[0], pointCoords[1], pointSize, pointSize);
 
@@ -89,6 +90,7 @@ public class PurePursuit extends PApplet {
                     float[] prevPointCoords = followerPath.get(i - 1);
 
                     // Draw the line
+                    stroke(200);
                     line(pointCoords[0], pointCoords[1], prevPointCoords[0], prevPointCoords[1]);
                 }
             }
@@ -207,6 +209,7 @@ public class PurePursuit extends PApplet {
      */
     private void drawTwoPoints(float x1, float y1, float x2, float y2) {
         // Line between object and lookahead point
+        stroke(0);
         line(x1, y1, x2, y2);
 
         // Object point
