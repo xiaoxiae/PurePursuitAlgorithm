@@ -9,6 +9,9 @@ public class PurePursuit extends PApplet {
     // List of the points
     private List<float[]> points;
 
+    // List of a path drawn by the follower
+    private List<float[]> followerPath;
+
     // A PathFollower object and its variables
     private PathFollower pathFollower;
     private float pathFollowerSpeed = 2.5f;
@@ -45,13 +48,14 @@ public class PurePursuit extends PApplet {
     private void reset() {
         points = new ArrayList<>();
         pathFollower = null;
+        followerPath = null;
     }
 
     @Override
     public void draw() {
         background(255);
 
-        // Iterate through all points and draw them
+        // Iterate through all path points and draw them
         for (int i = 0; i < points.size(); i++) {
             // Coordinates of the point
             float[] pointCoords = points.get(i);
@@ -67,6 +71,25 @@ public class PurePursuit extends PApplet {
 
                 // Draw the line
                 line(pointCoords[0], pointCoords[1], prevPointCoords[0], prevPointCoords[1]);
+            }
+        }
+
+        // If there are any points on the follower's path
+        if (followerPath != null) {
+            // Iterate through all follower path points and draw them
+            for (int i = 0; i < followerPath.size(); i++) {
+
+                // Coordinates of the point
+                float[] pointCoords = followerPath.get(i);
+
+                // If it isn't the first point, connect this point to its predecessor
+                if (i > 0) {
+                    // Coords of the previous point
+                    float[] prevPointCoords = followerPath.get(i - 1);
+
+                    // Draw the line
+                    line(pointCoords[0], pointCoords[1], prevPointCoords[0], prevPointCoords[1]);
+                }
             }
         }
 
@@ -97,8 +120,14 @@ public class PurePursuit extends PApplet {
                 pathFollower = null;
             } else {
                 // Move the follower upon pressing 'f'
-                if (keyPressed && key == 'f')
+                if (keyPressed && key == 'f') {
+                    // We need to create a new coordinate pair, because the position of the pathfollower changes
+                    float[] tempFollowerPosition = pathFollower.getFollowerPosition();
+
+                    // Add new point to the follower's path and move the follower
+                    followerPath.add(new float[]{tempFollowerPosition[0], tempFollowerPosition[1]});
                     pathFollower.moveFollowerTowardsPoint(lookaheadCoordinates[0], lookaheadCoordinates[1]);
+                }
 
                 // Draw the follower
                 drawTwoPoints(followerPosition[0], followerPosition[1], lookaheadCoordinates[0], lookaheadCoordinates[1]);
@@ -199,6 +228,7 @@ public class PurePursuit extends PApplet {
         if (key == 'n' && points.size() > 0) {
             float[] firstPointCoordinates = points.get(0);
 
+            followerPath = new ArrayList<>();
             pathFollower = new PathFollower(firstPointCoordinates[0], firstPointCoordinates[1], pathFollowerSpeed);
         }
     }
