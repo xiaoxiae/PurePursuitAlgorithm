@@ -7,20 +7,20 @@ import java.util.List;
 
 public class PurePursuit extends PApplet {
     // List of the points
-    private List<float[]> points;
+    private List<float[]> path;
 
     // List of a path drawn by the follower
     private List<float[]> followerPath;
 
     // A PathFollower object and its variables
-    private PathFollower pathFollower;
-    private float pathFollowerSpeed = 2.5f;
-    private float pathFollowerStopDistance = 2;
+    private PathFollower follower;
+    private float followerSpeed = 2.5f;
+    private float followerStopDistance = 2;
 
     //Size of the ellipses
     private float pointSize = 4;
 
-    // The distance to look ahead
+    // The distance to look ahead (in pixels)
     private float lookaheadDistance = 45;
 
     // The colour of the pursued point
@@ -57,9 +57,9 @@ public class PurePursuit extends PApplet {
         background(255);
 
         // Iterate through all path points and draw them
-        for (int i = 0; i < points.size(); i++) {
+        for (int i = 0; i < path.size(); i++) {
             // Coordinates of the point
-            float[] pointCoords = points.get(i);
+            float[] pointCoords = path.get(i);
 
             // Create an eclipse as the point
             stroke(0);
@@ -69,7 +69,7 @@ public class PurePursuit extends PApplet {
             // If it isn't the first point, connect this point to its predecessor
             if (i > 0) {
                 // Coords of the previous point
-                float[] prevPointCoords = points.get(i - 1);
+                float[] prevPointCoords = path.get(i - 1);
 
                 // Draw the line
                 line(pointCoords[0], pointCoords[1], prevPointCoords[0], prevPointCoords[1]);
@@ -105,13 +105,13 @@ public class PurePursuit extends PApplet {
             float[] lookaheadPoint = getLookaheadPoint(x, y);
 
             // If the function returned a valid point, draw it
-            if (lookaheadPoint.length == 2) drawTwoPoints(x, y, lookaheadPoint[0], lookaheadPoint[1]);
+            if (lookaheadPoint.length == 2) drawFollower(x, y, lookaheadPoint[0], lookaheadPoint[1]);
         }
 
         // Draw and potentially moves the PathFollower
-        if (pathFollower != null) {
-            // Positions of the pathFollower and its lookahead point
-            float[] followerPosition = pathFollower.getFollowerPosition();
+        if (follower != null) {
+            // Positions of the follower and its lookahead point
+            float[] followerPosition = follower.getFollowerPosition();
             float[] lookaheadCoordinates = getLookaheadPoint(followerPosition[0], followerPosition[1]);
 
             // To calculate the distance between the lookahead point and the follower
@@ -119,21 +119,21 @@ public class PurePursuit extends PApplet {
             double offsetLookaheadY = lookaheadCoordinates[1] - followerPosition[1];
 
             // If the follower reached the destination, delete the follower
-            if (Math.sqrt(offsetLookaheadX * offsetLookaheadX + offsetLookaheadY * offsetLookaheadY) < pathFollowerStopDistance) {
-                pathFollower = null;
+            if (Math.sqrt(offsetLookaheadX * offsetLookaheadX + offsetLookaheadY * offsetLookaheadY) < followerStopDistance) {
+                follower = null;
             } else {
                 // Move the follower upon pressing 'f'
                 if (keyPressed && key == 'f') {
                     // We need to create a new coordinate pair, because the position of the pathfollower changes
-                    float[] tempFollowerPosition = pathFollower.getFollowerPosition();
+                    float[] tempFollowerPosition = follower.getFollowerPosition();
 
                     // Add new point to the follower's path and move the follower
                     followerPath.add(new float[]{tempFollowerPosition[0], tempFollowerPosition[1]});
-                    pathFollower.moveFollowerTowardsPoint(lookaheadCoordinates[0], lookaheadCoordinates[1]);
+                    follower.moveFollowerTowardsPoint(lookaheadCoordinates[0], lookaheadCoordinates[1]);
                 }
 
                 // Draw the follower
-                drawTwoPoints(followerPosition[0], followerPosition[1], lookaheadCoordinates[0], lookaheadCoordinates[1]);
+                drawFollower(followerPosition[0], followerPosition[1], lookaheadCoordinates[0], lookaheadCoordinates[1]);
             }
         }
     }
@@ -150,10 +150,10 @@ public class PurePursuit extends PApplet {
         float[] lookaheadPoint = new float[2];
 
         // Iterate through all the points
-        for (int i = 0; i < points.size() - 1; i++) {
+        for (int i = 0; i < path.size() - 1; i++) {
             // The path segment points
-            float[] lineStartPoints = points.get(i);
-            float[] lineEndPoints = points.get(i + 1);
+            float[] lineStartPoints = path.get(i);
+            float[] lineEndPoints = path.get(i + 1);
 
             // Translated path segment and the mouse coordinates
             float[] translatedCoords = new float[]{lineEndPoints[0] - lineStartPoints[0], lineEndPoints[1] - lineStartPoints[1]};
@@ -178,9 +178,9 @@ public class PurePursuit extends PApplet {
         }
 
         // Do we even have any points to draw? If we do, attempt to do so.
-        if (points.size() > 0) {
+        if (path.size() > 0) {
             // If the mouse is close enough to the end, simply select that as the pursuit target
-            float[] endPointCoordinates = points.get(points.size() - 1);
+            float[] endPointCoordinates = path.get(path.size() - 1);
 
             float endX = endPointCoordinates[0];
             float endY = endPointCoordinates[1];
@@ -202,12 +202,12 @@ public class PurePursuit extends PApplet {
     /**
      * Draw two points and a line between them.
      *
-     * @param x1 The x value of the first point.
-     * @param y1 The y value of the first point.
-     * @param x2 The x value of the second point.
-     * @param y2 The y value of the second point.
+     * @param x1 The x value of the follower.
+     * @param y1 The y value of the follower.
+     * @param x2 The x value of the lookahead.
+     * @param y2 The y value of the lookahead.
      */
-    private void drawTwoPoints(float x1, float y1, float x2, float y2) {
+    private void drawFollower(float x1, float y1, float x2, float y2) {
         // Line between object and lookahead point
         stroke(0);
         line(x1, y1, x2, y2);
@@ -220,7 +220,6 @@ public class PurePursuit extends PApplet {
 
         // Lookahead point
         ellipse(x2, y2, pointSize, pointSize);
-
     }
 
     @Override
@@ -229,11 +228,11 @@ public class PurePursuit extends PApplet {
         if (key == 'r') reset();
 
         // Create a new follower object at the beginning of the path
-        if (key == 'n' && points.size() > 0) {
-            float[] firstPointCoordinates = points.get(0);
+        if (key == 'n' && path.size() > 0) {
+            float[] firstPointCoordinates = path.get(0);
 
             followerPath = new ArrayList<>();
-            pathFollower = new PathFollower(firstPointCoordinates[0], firstPointCoordinates[1], pathFollowerSpeed);
+            follower = new PathFollower(firstPointCoordinates[0], firstPointCoordinates[1], followerSpeed);
         }
     }
 
@@ -241,7 +240,7 @@ public class PurePursuit extends PApplet {
     public void mousePressed() {
         // Add a new path point
         if (mouseButton == RIGHT) {
-            points.add(new float[]{mouseX, mouseY});
+            path.add(new float[]{mouseX, mouseY});
         }
     }
 }
