@@ -56,26 +56,6 @@ public class PurePursuit extends PApplet {
     public void draw() {
         background(255);
 
-        // Iterate through all path points and draw them
-        for (int i = 0; i < path.size(); i++) {
-            // Coordinates of the point
-            float[] pointCoords = path.get(i);
-
-            // Create an eclipse as the point
-            stroke(0);
-            fill(0);
-            ellipse(pointCoords[0], pointCoords[1], pointSize, pointSize);
-
-            // If it isn't the first point, connect this point to its predecessor
-            if (i > 0) {
-                // Coords of the previous point
-                float[] prevPointCoords = path.get(i - 1);
-
-                // Draw the line
-                line(pointCoords[0], pointCoords[1], prevPointCoords[0], prevPointCoords[1]);
-            }
-        }
-
         // If there are any points on the follower's path
         if (followerPath != null) {
             // Iterate through all follower path points and draw them
@@ -93,6 +73,26 @@ public class PurePursuit extends PApplet {
                     stroke(200);
                     line(pointCoords[0], pointCoords[1], prevPointCoords[0], prevPointCoords[1]);
                 }
+            }
+        }
+
+        // Iterate through all path points and draw them
+        for (int i = 0; i < path.size(); i++) {
+            // Coordinates of the point
+            float[] pointCoords = path.get(i);
+
+            // Create an eclipse as the point
+            stroke(0);
+            fill(0);
+            ellipse(pointCoords[0], pointCoords[1], pointSize, pointSize);
+
+            // If it isn't the first point, connect this point to its predecessor
+            if (i > 0) {
+                // Coords of the previous point
+                float[] prevPointCoords = path.get(i - 1);
+
+                // Draw the line
+                line(pointCoords[0], pointCoords[1], prevPointCoords[0], prevPointCoords[1]);
             }
         }
 
