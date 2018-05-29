@@ -39,15 +39,16 @@ public class PurePursuit extends PApplet {
     public void setup() {
         colorMode(RGB);
 
-        points = new ArrayList<>();
+        reset();
     }
 
     /**
      * Reset the simulation.
      */
     private void reset() {
-        points = new ArrayList<>();
-        pathFollower = null;
+        path = new ArrayList<>();
+
+        follower = null;
         followerPath = null;
     }
 
