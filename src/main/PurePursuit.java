@@ -17,6 +17,8 @@ public class PurePursuit extends PApplet {
     private float followerSpeed = 2.5f;
     private float followerStopDistance = 2;
 
+    private float followerSpeedDelta = 2.5f;
+
     //Size of the ellipses
     private float pointSize = 4;
 
@@ -238,6 +240,12 @@ public class PurePursuit extends PApplet {
             followerPath = new ArrayList<>();
             follower = new PathFollower(firstPointCoordinates[0], firstPointCoordinates[1], followerSpeed);
         }
+
+        // Increase lookahead distance
+        if (key == '+') lookaheadDistance += followerSpeedDelta;
+
+        // Decreased lookahead distance
+        if (key == '-') lookaheadDistance -= followerSpeedDelta;
     }
 
     @Override
