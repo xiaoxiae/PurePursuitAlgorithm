@@ -105,7 +105,7 @@ public class PurePursuit extends PApplet {
             float[] lookaheadPoint = getLookaheadPoint(x, y, lookaheadDistance);
 
             // If the function returned a valid point, draw it
-            if (lookaheadPoint != null) drawFollower(x, y, lookaheadPoint[0], lookaheadPoint[1]);
+            if (lookaheadPoint != null) drawLookaheadPoint(x, y, lookaheadPoint[0], lookaheadPoint[1]);
         }
 
         // Draw and potentially moves the PathFollower
@@ -114,26 +114,33 @@ public class PurePursuit extends PApplet {
             float[] followerPosition = follower.getFollowerPosition();
             float[] lookaheadCoordinates = getLookaheadPoint(followerPosition[0], followerPosition[1], lookaheadDistance);
 
-            // To calculate the distance between the lookahead point and the follower
-            double offsetLookaheadX = lookaheadCoordinates[0] - followerPosition[0];
-            double offsetLookaheadY = lookaheadCoordinates[1] - followerPosition[1];
+            // Draw the follower
+            fill(0);
+            ellipse(followerPosition[0], followerPosition[1], pointSize, pointSize);
 
-            // If the follower reached the destination, delete the follower
-            if (Math.sqrt(offsetLookaheadX * offsetLookaheadX + offsetLookaheadY * offsetLookaheadY) < followerStopDistance) {
-                follower = null;
-            } else {
-                // Move the follower upon pressing 'f'
-                if (keyPressed && key == 'f') {
-                    // We need to create a new coordinate pair, because the position of the pathfollower changes
-                    float[] tempFollowerPosition = follower.getFollowerPosition();
+            // If lookahead coordinates for the follower exist
+            if (lookaheadCoordinates != null) {
+                // To calculate the distance between the lookahead point and the follower
+                double offsetLookaheadX = lookaheadCoordinates[0] - followerPosition[0];
+                double offsetLookaheadY = lookaheadCoordinates[1] - followerPosition[1];
 
-                    // Add new point to the follower's path and move the follower
-                    followerPath.add(new float[]{tempFollowerPosition[0], tempFollowerPosition[1]});
-                    follower.moveFollowerTowardsPoint(lookaheadCoordinates[0], lookaheadCoordinates[1]);
+                // If the follower reached the destination, delete the follower
+                if (Math.sqrt(offsetLookaheadX * offsetLookaheadX + offsetLookaheadY * offsetLookaheadY) < followerStopDistance) {
+                    follower = null;
+                } else {
+                    // Move the follower upon pressing 'f'
+                    if (keyPressed && key == 'f') {
+                        // We need to create a new coordinate pair, because the position of the pathFollower changes
+                        float[] tempFollowerPosition = follower.getFollowerPosition();
+
+                        // Add new point to the follower's path and move the follower
+                        followerPath.add(new float[]{tempFollowerPosition[0], tempFollowerPosition[1]});
+                        follower.moveFollowerTowardsPoint(lookaheadCoordinates[0], lookaheadCoordinates[1]);
+                    }
                 }
 
-                // Draw the follower
-                drawFollower(followerPosition[0], followerPosition[1], lookaheadCoordinates[0], lookaheadCoordinates[1]);
+                // Draw the lookahead point
+                drawLookaheadPoint(followerPosition[0], followerPosition[1], lookaheadCoordinates[0], lookaheadCoordinates[1]);
             }
         }
     }
@@ -200,20 +207,17 @@ public class PurePursuit extends PApplet {
     }
 
     /**
-     * Draw two points and a line between them.
+     * Draw a lookahead point and the line to it.
      *
      * @param x1 The x value of the follower.
      * @param y1 The y value of the follower.
      * @param x2 The x value of the lookahead.
      * @param y2 The y value of the lookahead.
      */
-    private void drawFollower(float x1, float y1, float x2, float y2) {
+    private void drawLookaheadPoint(float x1, float y1, float x2, float y2) {
         // Line between object and lookahead point
         stroke(0);
         line(x1, y1, x2, y2);
-
-        // Object point
-        ellipse(x1, y1, pointSize, pointSize);
 
         // Fill the circle with the desired color of the point to be pursued
         fill(pursuedCircleColor[0], pursuedCircleColor[1], pursuedCircleColor[2]);
