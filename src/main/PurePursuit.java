@@ -102,7 +102,7 @@ public class PurePursuit extends PApplet {
             int y = mouseY;
 
             // Get the lookahead point from the mouse coordinates
-            float[] lookaheadPoint = getLookaheadPoint(x, y);
+            float[] lookaheadPoint = getLookaheadPoint(x, y, lookaheadDistance);
 
             // If the function returned a valid point, draw it
             if (lookaheadPoint.length == 2) drawFollower(x, y, lookaheadPoint[0], lookaheadPoint[1]);
@@ -112,7 +112,7 @@ public class PurePursuit extends PApplet {
         if (follower != null) {
             // Positions of the follower and its lookahead point
             float[] followerPosition = follower.getFollowerPosition();
-            float[] lookaheadCoordinates = getLookaheadPoint(followerPosition[0], followerPosition[1]);
+            float[] lookaheadCoordinates = getLookaheadPoint(followerPosition[0], followerPosition[1], lookaheadDistance);
 
             // To calculate the distance between the lookahead point and the follower
             double offsetLookaheadX = lookaheadCoordinates[0] - followerPosition[0];
@@ -143,9 +143,9 @@ public class PurePursuit extends PApplet {
      *
      * @param x The x of the origin.
      * @param y The y of the origin.
-     * @return A float[] coordinate pair if the lookahead point exists, or an empty float[0] if it doesn't.
+     * @return A float[] coordinate pair if the lookahead point exists, or null.
      */
-    float[] getLookaheadPoint(float x, float y) {
+    private float[] getLookaheadPoint(float x, float y, float lookaheadDistance) {
         // The point that will be selected to be pursued from the line segments
         float[] lookaheadPoint = new float[2];
 
