@@ -105,7 +105,7 @@ public class PurePursuit extends PApplet {
             float[] lookaheadPoint = getLookaheadPoint(x, y, lookaheadDistance);
 
             // If the function returned a valid point, draw it
-            if (lookaheadPoint.length == 2) drawFollower(x, y, lookaheadPoint[0], lookaheadPoint[1]);
+            if (lookaheadPoint != null) drawFollower(x, y, lookaheadPoint[0], lookaheadPoint[1]);
         }
 
         // Draw and potentially moves the PathFollower
@@ -196,7 +196,7 @@ public class PurePursuit extends PApplet {
             }
         }
 
-        return new float[0];
+        return null;
     }
 
     /**
