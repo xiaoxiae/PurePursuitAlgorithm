@@ -3,16 +3,20 @@
 ## Introduction
 This repository is a Processing implementation of the Adaptive Pure Pursuit algorithm used to control FRC robots.
 
-![](https://i.imgur.com/tBCkt62.gif)
+![](https://i.imgur.com/CKeM8nW.gif)
 
-## Controls
-The program features minimalistic path creation, and path following functionality:
+## Controls and Features
+The program features minimalistic path creation and following functionality:
 
 * **Left click** shows the lookahead line from the cursor to the nearest path line. 
 * **Right click** creates new points on the path.
 * **r** resets the simulation.
 * **n** creates a new path follower that is moved by pressing.
     + **f** moves the follower towards the end of the path.
+	+ **+** increases the lookahead distance.
+	+ **-** decreases the lookahead distance.
+	
+The follower also leaves a dashed path behind and has a circle around its origin to visualise the lookahead distance.
 
 ## Running the project
 
