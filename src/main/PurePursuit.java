@@ -126,6 +126,16 @@ public class PurePursuit extends PApplet {
                 double offsetLookaheadX = lookaheadCoordinates[0] - followerPosition[0];
                 double offsetLookaheadY = lookaheadCoordinates[1] - followerPosition[1];
 
+                // Draw the lookahead point
+                drawLookaheadPoint(followerPosition[0], followerPosition[1], lookaheadCoordinates[0], lookaheadCoordinates[1]);
+
+                // The distance from follower position to lookahead position
+                float distance = 2 * (float)Math.sqrt(Math.pow(lookaheadCoordinates[0] - followerPosition[0], 2) + Math.pow(lookaheadCoordinates[1] - followerPosition[1], 2));
+
+                // Circle around the follower
+                noFill();
+                ellipse(followerPosition[0], followerPosition[1], distance, distance);
+
                 // If the follower reached the destination, delete the follower
                 if (Math.sqrt(offsetLookaheadX * offsetLookaheadX + offsetLookaheadY * offsetLookaheadY) < followerStopDistance) {
                     follower = null;
@@ -140,9 +150,6 @@ public class PurePursuit extends PApplet {
                         follower.moveFollowerTowardsPoint(lookaheadCoordinates[0], lookaheadCoordinates[1]);
                     }
                 }
-
-                // Draw the lookahead point
-                drawLookaheadPoint(followerPosition[0], followerPosition[1], lookaheadCoordinates[0], lookaheadCoordinates[1]);
             }
         }
     }
