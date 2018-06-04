@@ -61,7 +61,7 @@ public class PurePursuit extends PApplet {
         // If there are any points on the follower's path
         if (followerPath != null) {
             // Iterate through all follower path points and draw them
-            for (int i = 0; i < followerPath.size(); i++) {
+            for (int i = 0; i < followerPath.size(); i+= 4) {
 
                 // Coordinates of the point
                 float[] pointCoords = followerPath.get(i);
@@ -72,7 +72,7 @@ public class PurePursuit extends PApplet {
                     float[] prevPointCoords = followerPath.get(i - 1);
 
                     // Draw the line
-                    stroke(200);
+                    stroke(120);
                     line(pointCoords[0], pointCoords[1], prevPointCoords[0], prevPointCoords[1]);
                 }
             }
