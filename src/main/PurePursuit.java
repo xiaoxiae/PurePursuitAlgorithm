@@ -259,8 +259,6 @@ public class PurePursuit extends PApplet {
     @Override
     public void mousePressed() {
         // Add a new path point
-        if (mouseButton == RIGHT) {
-            path.add(new float[]{mouseX, mouseY});
-        }
+        if (mouseButton == RIGHT) path.add(new float[]{mouseX, mouseY});
     }
 }
